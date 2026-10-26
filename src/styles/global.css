@@ -1,7 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter";
+/* Variable weight + optical size: Inter switches to its Display cut at large sizes. */
+@import "@fontsource-variable/inter/opsz.css";
 @import "lenis/dist/lenis.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -28,13 +29,7 @@
 }
 
 @theme inline {
-  /*
-   * SF Pro via the system font stack. Apple's license doesn't allow
-   * self-hosting SF, so Apple devices render it natively and everything
-   * else falls back to Inter, its closest open equivalent.
-   */
   --font-sans:
-    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
     "Inter Variable", "Apple SD Gothic Neo", "Noto Sans KR", ui-sans-serif,
     system-ui, sans-serif;
   --font-heading: var(--font-sans);
@@ -95,6 +90,8 @@
   html {
     @apply bg-background font-sans antialiased;
     text-rendering: optimizeLegibility;
+    /* Tight tracking site-wide; display type sets its own tighter values. */
+    letter-spacing: -0.025em;
   }
   body {
     @apply bg-background text-foreground;
