@@ -1,0 +1,156 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/inter-tight";
+@import "lenis/dist/lenis.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Brand palette — warm, low-light, skin-toned.
+ * The site is dark by design, so shadcn's tokens map straight onto it.
+ */
+@theme {
+  --color-ink: #14100d;
+  --color-ink-2: #1c1612;
+  --color-peach: #f4d9c1;
+  --color-sand: #b39c87;
+  --color-sand-ink: #1e1712;
+  --color-clay: #8a7360;
+  --color-ember: #c4552c;
+  --color-blood: #7a1d12;
+
+  --text-display: clamp(4.25rem, 15vw, 17rem);
+  --text-display--line-height: 0.86;
+  --text-display--letter-spacing: -0.045em;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@theme inline {
+  --font-sans:
+    "Inter Tight Variable", "Apple SD Gothic Neo", "Noto Sans KR",
+    ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  color-scheme: dark;
+  --background: #14100d;
+  --foreground: #f4d9c1;
+  --card: #1c1612;
+  --card-foreground: #f4d9c1;
+  --popover: #1c1612;
+  --popover-foreground: #f4d9c1;
+  --primary: #f4d9c1;
+  --primary-foreground: #1e1712;
+  --secondary: #b39c87;
+  --secondary-foreground: #1e1712;
+  --muted: #241c17;
+  --muted-foreground: #a38c78;
+  --accent: #2a211b;
+  --accent-foreground: #f4d9c1;
+  --destructive: #e0563a;
+  --border: rgb(244 217 193 / 0.14);
+  --input: rgb(244 217 193 / 0.2);
+  --ring: #c4552c;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply bg-background font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  ::selection {
+    @apply bg-ember text-peach;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  /* Film grain laid over imagery; pure SVG so it ships no extra request. */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.22;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/*
+ * Reveal primitives. Initial hidden states only apply once JS has booted
+ * (html.js), so content is always visible without scripts.
+ */
+@layer utilities {
+  .split-mask {
+    display: inline-block;
+    /* Clip vertically only: tight tracking lets glyphs overhang their box. */
+    overflow: visible clip;
+    vertical-align: top;
+    /* Room for descenders/ascenders that the mask would otherwise crop. */
+    padding-block: 0.08em;
+    margin-block: -0.08em;
+  }
+  .split-unit {
+    display: inline-block;
+    will-change: transform;
+  }
+  html.js [data-split] .split-unit {
+    transform: translateY(110%);
+  }
+  html.js [data-reveal] {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  html.js [data-reveal-group] > * {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-split] .split-unit,
+  html.js [data-reveal],
+  html.js [data-reveal-group] > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

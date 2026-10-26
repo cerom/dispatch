@@ -1,0 +1,44 @@
+---
+import "@/styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "sohn손 — Hands don't lie",
+  description = "Peptide infused hand masks. A twenty-minute ritual for the part of you that does everything.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#14100d" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <title>{title}</title>
+    <!-- Flag JS early so reveal states apply before first paint (no flash). -->
+    <script is:inline>
+      document.documentElement.classList.add("js");
+    </script>
+  </head>
+  <body class="min-h-svh overflow-x-clip">
+    <slot />
+    <script>
+      import { initSmoothScroll } from "@/scripts/smooth-scroll";
+      import { initReveals } from "@/scripts/reveal";
+      import { initPinnedSections } from "@/scripts/pinned";
+
+      initSmoothScroll();
+      initReveals();
+      initPinnedSections();
+    </script>
+  </body>
+</html>

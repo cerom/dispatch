@@ -1,0 +1,85 @@
+---
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const columns = [
+  { title: "Shop", links: ["Hand masks", "Subscriptions", "Gift cards"] },
+  { title: "About", links: ["Science", "Ritual", "Journal"] },
+  { title: "Help", links: ["Shipping", "Returns", "Contact"] },
+];
+---
+
+<footer class="px-2 pb-2 sm:px-4 sm:pb-4 md:px-[3.25%]">
+  <div class="grain relative overflow-hidden rounded-[2.5rem] bg-sand text-sand-ink md:rounded-[4rem]">
+    <div class="grid gap-14 px-6 pt-14 sm:px-10 md:grid-cols-12 md:px-14 md:pt-20">
+      <div class="md:col-span-5">
+        <h2
+          class="text-4xl leading-[0.95] font-light tracking-[-0.04em] md:text-5xl"
+          data-split="words"
+        >
+          Notes on hands, sent rarely.
+        </h2>
+        <form class="mt-8 flex max-w-md gap-2" data-newsletter data-reveal>
+          <label for="email" class="sr-only">
+            Email
+          </label>
+          <Input
+            id="email"
+            type="email"
+            required
+            placeholder="you@email.com"
+            className="h-12 rounded-full border-sand-ink/25 bg-transparent px-5 text-base text-sand-ink placeholder:text-sand-ink/50 dark:bg-transparent"
+          />
+          <Button
+            type="submit"
+            className="h-12 rounded-full bg-sand-ink px-6 text-base text-sand hover:bg-sand-ink/85"
+          >
+            Subscribe
+          </Button>
+        </form>
+      </div>
+
+      <nav
+        aria-label="Footer"
+        class="grid grid-cols-3 gap-6 md:col-span-6 md:col-start-7"
+        data-reveal-group
+      >
+        {columns.map((c) => (
+          <div>
+            <h3 class="text-sm text-sand-ink/55">{c.title}</h3>
+            <ul class="mt-4 space-y-2">
+              {c.links.map((l) => (
+                <li>
+                  <a href="#" class="transition-opacity hover:opacity-60">
+                    {l}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </div>
+
+    <p
+      class="mt-16 px-4 text-center text-[44vw] leading-[0.78] font-medium tracking-[-0.07em] select-none md:mt-24 md:text-[40vw]"
+      data-split="chars"
+      data-stagger="0.05"
+      aria-label="sohn"
+    >
+      sohn
+    </p>
+
+    <div class="flex flex-col gap-2 px-6 py-6 text-sm text-sand-ink/60 sm:flex-row sm:justify-between sm:px-10 md:px-14">
+      <span>© {new Date().getFullYear()} sohn손</span>
+      <span>손 (sohn) — Korean for “hand”.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Placeholder until a newsletter provider is wired up.
+  document
+    .querySelector("[data-newsletter]")
+    ?.addEventListener("submit", (e) => e.preventDefault());
+</script>

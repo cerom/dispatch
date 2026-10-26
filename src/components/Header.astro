@@ -1,0 +1,109 @@
+---
+import Logo from "@/components/Logo.astro";
+
+const left = [
+  { label: "Shop", href: "#shop" },
+  { label: "Science", href: "#science" },
+];
+const right = [{ label: "Ritual", href: "#ritual" }];
+const linkClass =
+  "rounded-full px-3 py-1.5 text-[0.95rem] text-sand-ink/90 transition-colors hover:bg-sand-ink/8 hover:text-sand-ink";
+---
+
+<header class="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:pt-6">
+  <nav
+    data-nav
+    aria-label="Primary"
+    class="pointer-events-auto w-full max-w-[56rem] overflow-hidden rounded-[2rem] bg-sand/95 text-sand-ink shadow-[0_10px_40px_-10px_rgb(0_0_0/0.6)] backdrop-blur-md"
+  >
+    <div class="grid h-14 grid-cols-[1fr_auto_1fr] items-center px-3 md:h-[4.5rem] md:px-6">
+      <ul class="hidden items-center gap-4 md:flex lg:gap-8">
+        {left.map((l) => (
+          <li>
+            <a class={linkClass} href={l.href}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <button
+        type="button"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        class="justify-self-start rounded-full px-3 py-1.5 text-[0.95rem] md:hidden"
+      >
+        <span data-nav-label>Menu</span>
+      </button>
+
+      <a
+        href="#top"
+        aria-label="sohn home"
+        class="text-[1.65rem] md:text-[2.1rem]"
+      >
+        <Logo />
+      </a>
+
+      <ul class="hidden items-center justify-end gap-4 md:flex lg:gap-8">
+        {right.map((l) => (
+          <li>
+            <a class={linkClass} href={l.href}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+        <li>
+          <a class={linkClass} href="#shop">
+            Cart (<span data-cart-count>0</span>)
+          </a>
+        </li>
+      </ul>
+      <a
+        class="justify-self-end rounded-full px-3 py-1.5 text-[0.95rem] md:hidden"
+        href="#shop"
+      >
+        Cart (0)
+      </a>
+    </div>
+
+    <div id="mobile-menu" data-nav-menu hidden class="px-3 pb-5 md:hidden">
+      <ul class="flex flex-col gap-1 border-t border-sand-ink/15 pt-4">
+        {[...left, ...right].map((l) => (
+          <li>
+            <a
+              href={l.href}
+              class="block rounded-2xl px-3 py-2 text-3xl font-light tracking-tight hover:bg-sand-ink/8"
+            >
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const nav = document.querySelector<HTMLElement>("[data-nav]");
+  const toggle = nav?.querySelector<HTMLButtonElement>("[data-nav-toggle]");
+  const menu = nav?.querySelector<HTMLElement>("[data-nav-menu]");
+  const label = nav?.querySelector<HTMLElement>("[data-nav-label]");
+
+  const setOpen = (open: boolean) => {
+    if (!toggle || !menu || !label) return;
+    toggle.setAttribute("aria-expanded", String(open));
+    menu.hidden = !open;
+    label.textContent = open ? "Close" : "Menu";
+  };
+
+  toggle?.addEventListener("click", () =>
+    setOpen(toggle.getAttribute("aria-expanded") !== "true"),
+  );
+  menu
+    ?.querySelectorAll("a")
+    .forEach((a) => a.addEventListener("click", () => setOpen(false)));
+  document.addEventListener(
+    "keydown",
+    (e) => e.key === "Escape" && setOpen(false),
+  );
+</script>
