@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter-tight";
+@import "@fontsource-variable/inter";
 @import "lenis/dist/lenis.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -28,9 +28,15 @@
 }
 
 @theme inline {
+  /*
+   * SF Pro via the system font stack. Apple's license doesn't allow
+   * self-hosting SF, so Apple devices render it natively and everything
+   * else falls back to Inter, its closest open equivalent.
+   */
   --font-sans:
-    "Inter Tight Variable", "Apple SD Gothic Neo", "Noto Sans KR",
-    ui-sans-serif, system-ui, sans-serif;
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Inter Variable", "Apple SD Gothic Neo", "Noto Sans KR", ui-sans-serif,
+    system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --color-ring: var(--ring);
   --color-input: var(--input);

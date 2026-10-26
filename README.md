@@ -27,6 +27,7 @@ src/
     reveal.ts                 Motion text/element reveals (data attributes below)
     pinned.ts                 pinned horizontal scroll sections
   styles/global.css           Tailwind theme + brand tokens mapped onto shadcn variables
+                              (font: SF Pro via system stack, Inter fallback off Apple devices)
   assets/                     drop hero.(jpg|png|webp) here to replace the hero gradient
 ```
 
