@@ -1,0 +1,59 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+// Drop a photo at src/assets/hero.(jpg|png|webp) and it replaces the
+// gradient placeholder automatically.
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/hero.{jpg,jpeg,png,webp,avif}",
+  {
+    eager: true,
+  },
+);
+const hero = Object.values(images)[0]?.default;
+---
+
+<section id="top" class="px-2 sm:px-4 md:px-[3.25%]" data-parallax-root>
+  <div class="grain relative isolate h-[92svh] min-h-[36rem] overflow-hidden rounded-b-[2.5rem] border border-t-0 border-peach/15 md:h-[96svh] md:rounded-b-[5rem]">
+    <!-- Imagery -->
+    <div class="absolute inset-0 -z-10 scale-105" data-parallax="0.18">
+      {hero ? (
+        <Image
+          src={hero}
+          alt=""
+          loading="eager"
+          fetchpriority="high"
+          widths={[800, 1400, 2160]}
+          sizes="100vw"
+          class="size-full object-cover object-[60%_50%] md:object-[22%_50%]"
+        />
+      ) : (
+        <div
+          aria-hidden="true"
+          class="size-full bg-[radial-gradient(60%_45%_at_62%_62%,#f0a066_0%,#c2552c_28%,#5e1a10_55%,transparent_80%),radial-gradient(40%_30%_at_30%_70%,#a63a1e_0%,transparent_70%),linear-gradient(170deg,#100c09_0%,#2a1a12_45%,#6b3820_70%,#24140d_100%)]"
+        />
+      )}
+      <div class="absolute inset-0 bg-gradient-to-b from-ink/60 via-transparent to-ink/30"></div>
+    </div>
+
+    <!-- Copy -->
+    <div class="flex h-full flex-col items-end justify-end px-5 pb-12 text-right sm:px-8 md:justify-center md:pt-24 md:pb-0 lg:px-[2.5%]">
+      <h1
+        class="text-[23vw] leading-[0.86] tracking-[-0.045em] sm:text-display font-extralight text-peach uppercase"
+        data-split="chars"
+        data-delay="0.25"
+      >
+        <span class="block">Hands</span>
+        <span class="block">Don't</span>
+        <span class="block">Lie</span>
+      </h1>
+      <p
+        class="mt-4 text-xl font-light tracking-[-0.05em] text-peach/90 sm:text-2xl md:mt-6 md:text-[2.3vw]"
+        data-split="words"
+        data-delay="0.9"
+      >
+        peptide infused hand masks
+      </p>
+    </div>
+  </div>
+</section>
