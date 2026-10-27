@@ -83,18 +83,28 @@
   --radius: 0.75rem;
 }
 
+/*
+ * Page-level type and color stay unlayered on purpose: layered rules lose to
+ * any unlayered CSS, so a host or embed stylesheet (e.g. `body { background:
+ * #fff }`) would otherwise override them and leave light text on white.
+ */
+html,
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+  /* Tight tracking site-wide; display type sets its own tighter values. */
+  letter-spacing: -0.025em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
-  }
-  html {
-    @apply bg-background font-sans antialiased;
-    text-rendering: optimizeLegibility;
-    /* Tight tracking site-wide; display type sets its own tighter values. */
-    letter-spacing: -0.025em;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
   ::selection {
     @apply bg-ember text-peach;
