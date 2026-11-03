@@ -1,249 +1,51 @@
-# Dispatch - AI Native Task Coordination
+# FaceKey — make a face, get the emoji
 
-> Stop chatting, start doing.
+A native iOS app + custom keyboard. Pull a face at the front camera and FaceKey ranks the emojis that look most like your expression. Tap one to type it.
 
-Dispatch is an AI-native task coordination system for B2B teams. Instead of chat-based communication, team members tell the system what they need, and a central AI intelligently routes tasks to the best-qualified available person - or completes the task autonomously if possible.
-
-## The Problem
-
-- Messages are unclear between coworkers
-- People get assigned tasks when they're already at capacity
-- Passive-aggressive communication and workplace friction
-- Time wasted on tasks that AI could handle
-
-## The Solution
-
-1. **Tell the AI what you need** - Natural language task requests
-2. **AI decides the best approach**:
-   - **AI Direct**: Completes task immediately (writing, analysis, etc.)
-   - **Human Assignment**: Routes to best-matched team member based on skills & capacity
-3. **Anonymous task assignment** - No bias, just work
-4. **Automatic reassignment** - Tasks get reassigned before deadlines if not on track
-5. **Smart notifications** - Real-time updates on task progress
-
-## Tech Stack
-
-- **Frontend**: Next.js 15 + React + TypeScript + Tailwind CSS
-- **Backend**: Next.js API Routes
-- **Database**: Neon (Serverless Postgres) + Drizzle ORM
-- **AI**: Anthropic Claude API (Sonnet 4.5)
-
-## Setup
-
-### 1. Install Dependencies
-
-```bash
-bun install
-```
-
-### 2. Configure Environment
-
-Create `.env.local`:
-
-```bash
-cp .env.example .env.local
-```
-
-Edit `.env.local`:
-
-```env
-DATABASE_URL=your_neon_connection_string
-ANTHROPIC_API_KEY=your_claude_api_key
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-**Get your credentials:**
-- **Neon**: https://neon.tech (free tier, create new project)
-- **Claude API**: https://console.anthropic.com (get API key)
-
-### 3. Setup Database
-
-```bash
-bun run db:setup
-```
-
-This creates tables and seeds demo users:
-- **Sarah Chen** (Engineer) - Default user
-- **Jordan Rivers** (Data Analyst)
-- **Alex Park** (PM)
-
-### 4. Start Development Server
-
-```bash
-bun run dev
-```
-
-Open http://localhost:3000
-
-## Project Structure
+## How it works
 
 ```
-dispatch/
-├── app/
-│   ├── api/              # API routes
-│   │   ├── chat/         # AI coordinator endpoint
-│   │   ├── tasks/        # Task CRUD
-│   │   └── users/        # User management
-│   ├── page.tsx          # Home page (TODO: UI)
-│   └── layout.tsx        # Root layout
-├── lib/
-│   ├── db/
-│   │   ├── schema.ts     # Database schema
-│   │   ├── client.ts     # Neon connection
-│   │   └── seed.ts       # Demo data seeder
-│   └── services/
-│       ├── ai-coordinator.ts    # Claude API integration
-│       └── task-assignment.ts   # Assignment algorithm
-├── public/
-│   └── logo.png          # Dispatch logo
-└── drizzle.config.ts     # Drizzle ORM config
+┌──────────── FaceKey app ─────────────┐        App Group         ┌──── FaceKey keyboard ────┐
+│ ARKit face tracking (TrueDepth)      │   (shared UserDefaults)  │ Face-match row on top     │
+│ 52 blend shapes → 16 features        │ ───── top 12 emojis ───▶ │ Full emoji grid           │
+│ EmojiMatcher ranks 61 face emojis    │                          │ 📷 button opens the app   │
+└──────────────────────────────────────┘ ◀──── facekey://scan ─── └───────────────────────────┘
 ```
 
-## API Endpoints
+**Why the app does the scanning:** iOS doesn't let keyboard extensions use the camera. So the keyboard's face button opens the FaceKey app (`facekey://scan`), you pull a face, then tap **◀︎** in the top-left status bar to go back. The keyboard picks up the matches from the shared App Group within a second.
 
-### Chat
-- `POST /api/chat` - Send message to AI coordinator
-  - Body: `{ message: string, userId: string }`
-  - Returns: Task assignment or AI direct result
+- `Shared/` — compiled into both targets
+  - `FaceFeatures.swift` — 16 expression features (smile, wink, tongue out, brows up, pucker, …), each 0–1
+  - `EmojiCatalog.swift` — 61 face emojis, each with a hand-tuned expression target
+  - `EmojiMatcher.swift` — weighted RMS distance between your face and each target → ranked matches
+  - `SharedStore.swift` — App Group storage (latest matches + recents)
+- `App/` — SwiftUI app: live camera, top match overlay, tap-to-copy grid, feature readout, keyboard setup guide
+- `Keyboard/` — `UIInputViewController` hosting a SwiftUI emoji keyboard
+- `Tests/` — unit tests for the matcher
 
-### Tasks
-- `GET /api/tasks?userId={id}&view={my-tasks|sent|done}` - Get tasks
-- `POST /api/tasks/{id}/complete` - Mark task complete
-  - Body: `{ userId: string }`
+Tuning: blend-shape gains live in `App/FaceFeatures+ARKit.swift`, emoji targets in `Shared/EmojiCatalog.swift`.
 
-### Users
-- `GET /api/users` - List all users
+## Build & run
 
-## Database Schema
+Requirements: a Mac with Xcode 15+, [XcodeGen](https://github.com/yonaskolb/XcodeGen), and an iPhone with Face ID (TrueDepth camera). Face tracking doesn't work in the Simulator.
 
-### Users
-- id (text) - 'sarah', 'jordan', 'alex'
-- name, email, role
-- skills (array) - e.g., ['code', 'typescript', 'react']
-- currentCapacity / maxCapacity - Task load management
-
-### Tasks
-- id (uuid)
-- title, description, deadline, priority
-- requiredSkills (array)
-- status - 'pending' | 'assigned' | 'in_progress' | 'completed'
-- requesterId / assigneeId - Anonymous until completion
-- aiCompleted - Boolean for AI direct execution
-- aiResult - Result text for AI-completed tasks
-- progressPercentage - 0-100
-
-### Messages
-- Task-scoped chat threads
-- Links to tasks for conversation history
-
-## How It Works
-
-### 1. Task Coordination Flow
-
-```
-User types: "I need a summary of last week's metrics by Friday"
-        ↓
-AI Coordinator analyzes request
-        ↓
-    Determines execution tier:
-    - ai_direct: AI completes immediately
-    - human: Assigns to best match
-        ↓
-Task Assignment Algorithm:
-    1. Find users with required skills
-    2. Filter by available capacity
-    3. Sort by: capacity DESC, skill match DESC
-    4. Assign to top match
-        ↓
-Task created & user notified
+```sh
+brew install xcodegen
+# edit project.yml: set BUNDLE_ID_BASE to your own reverse-DNS id and DEVELOPMENT_TEAM to your team id
+xcodegen generate
+open FaceKey.xcodeproj
 ```
 
-### 2. AI Coordinator
+Run the **FaceKey** scheme on your phone, then:
 
-Uses Claude to:
-- Parse natural language into structured task data
-- Determine if task can be completed autonomously
-- Extract title, description, deadline, priority, required skills
-- Execute ai_direct tasks immediately
+1. Settings → FaceKey → Keyboards → enable **FaceKey** and **Allow Full Access** (needed to read the shared matches).
+2. In any text field, hold 🌐 and pick FaceKey.
+3. Tap the face button, pull a face, tap ◀︎ to return, and tap an emoji.
 
-### 3. Assignment Algorithm
+Run tests with ⌘U (or `xcodebuild test -scheme FaceKey -destination 'platform=iOS Simulator,name=iPhone 16'`).
 
-```typescript
-function findBestAssignee(task):
-  1. Get all users
-  2. Filter: currentCapacity < maxCapacity
-  3. Calculate skill match percentage
-  4. Filter: has ≥1 required skill
-  5. Sort by: available capacity DESC, skill match DESC
-  6. Return top match
-```
+## Known limitations
 
-## Development Commands
-
-```bash
-# Development
-bun run dev              # Start dev server
-
-# Database
-bun run db:push          # Push schema to database
-bun run db:seed          # Seed demo data
-bun run db:setup         # Push + seed (fresh start)
-bun run db:generate      # Generate migration
-
-# Build
-bun run build            # Production build
-bun run start            # Start production server
-```
-
-## Demo Users
-
-**Sarah Chen** (Engineer)
-- Skills: code, typescript, react, api-design, testing
-- ID: `sarah`
-
-**Jordan Rivers** (Data Analyst)
-- Skills: data, analysis, sql, spreadsheets, visualization, python
-- ID: `jordan`
-
-**Alex Park** (PM)
-- Skills: planning, writing, analysis, spreadsheets, user-research, roadmapping
-- ID: `alex`
-
-## Next Steps (Frontend)
-
-- [ ] Build main UI (split view: task list + chat)
-- [ ] Implement task cards with status indicators
-- [ ] Add real-time updates with WebSocket
-- [ ] Create task detail view with chat thread
-- [ ] Add user switcher for demo
-- [ ] Implement deadline conversation dialog
-- [ ] Add progress tracking UI
-
-## Testing
-
-Test the API directly:
-
-```bash
-# Get users
-curl http://localhost:3000/api/users
-
-# Create task via chat
-curl -X POST http://localhost:3000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "I need help analyzing Q4 metrics by Friday",
-    "userId": "sarah"
-  }'
-
-# Get my tasks
-curl "http://localhost:3000/api/tasks?userId=jordan&view=my-tasks"
-
-# Complete task
-curl -X POST http://localhost:3000/api/tasks/{task-id}/complete \
-  -H "Content-Type: application/json" \
-  -d '{"userId": "jordan"}'
-```
-
-## License
-
-MIT
+- Opening the app from the keyboard has no public API; it uses a responder-chain call that works today but App Review could flag it, and a future iOS could break it.
+- Requires a TrueDepth camera. A Vision-based fallback (2D landmarks) for older phones isn't built yet.
+- An iMessage app extension *can* use the camera, so a later version could do live in-chat matching without leaving Messages.
