@@ -7,11 +7,11 @@ carrier = "UNLOCKED/US"
 zip = "10022"                       # Midtown; Apple returns the nearest stores
 cities = ["New York"]               # Apple lists Manhattan stores with city "New York"
 # stores = ["Fifth Avenue", "SoHo"] # optional: only watch these store names
-buy_url = "https://www.apple.com/shop/buy-iphone/iphone-duo"
+buy_url = "https://www.apple.com/shop/buy-iphone/iphone-duo/7.6-inch-display-512gb-star-white-unlocked"
 
 [check]
-interval_seconds = 180              # minimum 60
-jitter_seconds = 60
+interval_seconds = 60               # minimum 60
+jitter_seconds = 15
 
 [ntfy]
 server = "https://ntfy.sh"

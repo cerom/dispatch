@@ -2,7 +2,7 @@
 
 Sends a push notification to your phone when an Apple Store in Manhattan has the **iPhone Duo 512GB Star White, unlocked** (`MK1G4LL/A`) in stock for pickup.
 
-It runs on a Raspberry Pi. Every ~3 minutes (with some randomness) it asks Apple for the same pickup data the **Check availability** link on apple.com shows. It alerts you only when a store goes from sold out to in stock, and the alert opens the buy page.
+It runs on a Raspberry Pi. Every minute (plus up to 15 s of randomness) it asks Apple for the same pickup data the **Check availability** link on apple.com shows. It alerts you only when a store goes from sold out to in stock, and tapping the alert opens the 512GB Star White unlocked page, so you can check out with Apple Pay.
 
 ## Playing fair with Apple
 
@@ -49,7 +49,7 @@ Needs Python 3.11+ (Raspberry Pi OS Bookworm or newer). No packages to install.
 | `watch.zip` | `10022` | Apple returns the stores nearest this zip. |
 | `watch.cities` | `["New York"]` | Apple lists Manhattan stores with city "New York", so this leaves out Brooklyn and the rest. |
 | `watch.stores` | (off) | Only watch these store names, e.g. `["Fifth Avenue", "SoHo"]`. |
-| `check.interval_seconds` | `180` | Minimum 60. |
+| `check.interval_seconds` | `60` | Minimum 60. |
 
 ## Tests
 

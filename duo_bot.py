@@ -71,9 +71,9 @@ class Config:
             zip_code=str(watch.get("zip", "10022")),
             cities=tuple(watch.get("cities", ["New York"])),
             stores=tuple(watch.get("stores", [])),
-            buy_url=watch.get("buy_url", "https://www.apple.com/shop/buy-iphone/iphone-duo"),
-            interval=max(float(check.get("interval_seconds", 180)), MIN_INTERVAL),
-            jitter=float(check.get("jitter_seconds", 60)),
+            buy_url=watch.get("buy_url", "https://www.apple.com/shop/buy-iphone/iphone-duo/7.6-inch-display-512gb-star-white-unlocked"),
+            interval=max(float(check.get("interval_seconds", 60)), MIN_INTERVAL),
+            jitter=float(check.get("jitter_seconds", 15)),
             ntfy_server=ntfy.get("server", "https://ntfy.sh").rstrip("/"),
             ntfy_topic=topic,
             state_path=path.with_name("state.json"),
@@ -219,7 +219,7 @@ def cmd_run(cfg: Config) -> int:
             backoff = 0
             in_stock = [s.name for s in stores if s.available]
             log.info("checked %d stores; in stock: %s", len(stores), ", ".join(in_stock) or "none")
-            delay = cfg.interval + random.uniform(-cfg.jitter, cfg.jitter)
+            delay = cfg.interval + random.uniform(0, cfg.jitter)
         except CheckFailed as e:
             backoff = min(max(backoff * 2, MIN_BACKOFF), MAX_BACKOFF)
             log.warning("%s; retrying in %d min", e, backoff // 60)
